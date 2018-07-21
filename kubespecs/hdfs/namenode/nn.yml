@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+ name: namenodep
+ labels:
+  zone: prod
+  version: v1
+  component: namenode
+spec:
+ containers:
+ - name: namenode
+   image: isl-dsdc.ca.com:5000/analytics/test/hadoop:2.7.3
+   ports:
+   - containerPort: 50070
+   - containerPort: 9000
+   command: ["/bin/sh","./startNamenode.sh"] 
+     
+   volumeMounts: 
+   - name: name-dir
+     mountPath: /opt/hadoop/data/dfs/name
+   - name: name-conf
+     mountPath: /opt/hadoop/data/conf
+   - name: name-log
+     mountPath: /opt/hadoop/data/logs
+ volumes: 
+   - name: name-dir
+     hostPath: 
+       path: /loddisk2/data/name
+       type: Directory
+   - name: name-conf
+     hostPath:
+       path: /loddisk2/data/conf
+   - name: name-log
+     hostPath:
+       path: /loddisk2/data/logs
+ nodeSelector:
+   node: namenode
+
