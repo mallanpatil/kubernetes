@@ -9,7 +9,7 @@ metadata:
 spec:
  containers:
  - name: namenode
-   image: isl-dsdc.ca.com:5000/analytics/test/hadoop:2.7.3
+   image: mallanpatil/hadoop:2.7.3
    ports:
    - containerPort: 50070
    - containerPort: 9000

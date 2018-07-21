@@ -1,5 +1,4 @@
 FROM mallanpatil/centos75-jre8
-#FROM isl-dsdc.ca.com:5001/ca-standard-images/centos72-jre8
 
 USER root
 
