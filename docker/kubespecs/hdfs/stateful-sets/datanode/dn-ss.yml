@@ -1,0 +1,71 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+ name: datanode
+ labels:
+  service: datanode
+spec:
+ clusterIP: None
+ ports:
+ - port: 50010
+   targetPort: 50010
+   name: rpc1
+ - port: 50020
+   targetPort: 50020
+   name: rpc2
+ - port: 50075
+   targetPort: 50070
+   name: web
+ selector:
+  comp: datanode
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: datanode
+
+spec:
+  selector:
+    matchLabels:
+      comp: datanode 
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  serviceName: datanode
+  template:
+    metadata:
+      labels:
+        comp: datanode
+    spec:
+      containers:
+      - name: datanode
+        image: isl-dsdc.ca.com:5000/analytics/test/hadoop:2.7.3
+        ports:
+        - containerPort: 50010
+        - containerPort: 50020
+        - containerPort: 50075 
+        command: ["/bin/sh","./startDatanode.sh"]
+
+        volumeMounts:
+        - name: datadir
+          mountPath: /opt/hadoop/data/dfs/data
+        - name: conf
+          mountPath: /opt/hadoop/data/conf
+        - name: log
+          mountPath: /opt/hadoop/data/logs
+      volumes:
+      - name: datadir
+        hostPath:
+         path: /loddisk2/data/dn-store
+         type: Directory
+      - name: conf
+        hostPath:
+          path: /loddisk2/data/conf
+      - name: log
+        hostPath:
+          path: /loddisk2/data/logs
+      nodeSelector:
+        node: datanode
+      restartPolicy: Always

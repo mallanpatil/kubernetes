@@ -1,0 +1,71 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+ name: namenode
+ labels:
+  service: namenode
+spec:
+ type: NodePort
+ ports:
+ - port: 9000
+   targetPort: 9000
+   nodePort: 30005
+   name: rpc
+ - port: 50070
+   targetPort: 50070
+   nodePort: 30006
+   name: web
+ selector:
+  comp: namenode
+
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: namenode
+
+spec:
+  selector:
+    matchLabels:
+      comp: namenode
+  serviceName: namenode
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+
+  template:
+    metadata:
+      labels:
+        comp: namenode
+    spec:
+      containers:
+      - name: namenode
+        image: isl-dsdc.ca.com:5000/analytics/test/hadoop:2.7.3
+        ports:
+        - containerPort: 50070
+        - containerPort: 9000
+        command: ["/bin/sh","./startNamenode.sh"]
+
+        volumeMounts:
+        - name: namedir
+          mountPath: /opt/hadoop/data/dfs/name
+        - name: nameconf
+          mountPath: /opt/hadoop/data/conf
+        - name: namelog
+          mountPath: /opt/hadoop/data/logs
+      volumes:
+      - name: namedir
+        hostPath:
+         path: /loddisk2/data/name
+         type: Directory
+      - name: nameconf
+        hostPath:
+          path: /loddisk2/data/conf
+      - name: namelog
+        hostPath:
+          path: /loddisk2/data/logs
+      nodeSelector:
+        node: namenode
+      restartPolicy: Always
