@@ -1,0 +1,32 @@
+FROM mallanpatil/centos75-jre8
+#FROM isl-dsdc.ca.com:5001/ca-standard-images/centos72-jre8
+
+USER root
+
+ARG hadoopVersion
+ARG installHome
+ENV HADOOP_VERSION $hadoopVersion 
+#ENV JAVA_HOME /usr/lib/jvm/jre 
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.171-8.b10.el7_5.x86_64/jre
+ENV INSTALL_HOME $installHome
+ENV HADOOP_HOME $installHome/hadoop-$hadoopVersion
+ENV HADOOP_CONF_DIR=$INSTALL_HOME/data/conf
+ENV PATH $HADOOP_HOME/bin/:$PATH
+ENV HADOOP_LOG_DIR=$INSTALL_HOME/data/logs
+#RUN mkdir -p $INSTALL_HOME
+ADD ./startDatanode.sh $INSTALL_HOME/startDatanode.sh
+ADD ./startNamenode.sh $INSTALL_HOME/startNamenode.sh
+
+RUN yum -y install which && mkdir -p $INSTALL_HOME && mkdir -p $INSTALL_HOME/data/dfs/name \ 
+   && mkdir -p $INSTALL_HOME/data/conf \ 
+   && mkdir -p $INSTALL_HOME/data/logs \
+   && mkdir -p $INSTALL_HOME/data/dfs/namesecondary \
+   && chmod a+x $INSTALL_HOME/startNamenode.sh \
+   && chmod a+x $INSTALL_HOME/startDatanode.sh \ 
+   && useradd -ms /bin/bash hadoop -u 1010 \
+   && chown -R hadoop:hadoop $INSTALL_HOME
+
+ADD hadoop-$hadoopVersion $HADOOP_HOME     
+USER hadoop
+WORKDIR $INSTALL_HOME
+EXPOSE 9000 50070 50010 50020 50075 50045
