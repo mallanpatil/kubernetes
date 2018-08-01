@@ -1,0 +1,13 @@
+---
+- hosts: hdfs
+  tasks: 
+  - name: "Installing Jave..."
+    yum:  
+  - name: "Checking namenode format"
+    command: ls /opt/hadoop/data/name/
+    register: command_output
+  - name: "looking for output"
+    debug: 
+      msg: "{{command_output}}"
+    when: command_output.stdout != ""
+

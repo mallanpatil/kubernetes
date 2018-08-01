@@ -1,0 +1,19 @@
+[namenode]
+nn ansible_ssh_host=patma22-I15199 ansible_ssh_pass=interOP@15199
+nn1 ansible_ssh_host=patma22-I15666 ansible_ssh_pass=interOP@15666
+
+[secondary_namenode]
+sn ansible_ssh_host=patma22-I15200 ansible_ssh_pass=interOP@15200
+
+[datanodes]
+dn1 ansible_ssh_host=patma22-I15201 ansible_ssh_pass=interOP@15201
+dn2 ansible_ssh_host=patma22-I15667 ansible_ssh_pass=interOP@15667
+
+[hdfs:children]
+namenode
+secondary_namenode
+datanodes
+
+[hdfs:vars]
+ansible_ssh_user=root
+
